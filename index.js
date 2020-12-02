@@ -1,16 +1,27 @@
 const fs = require('fs');
 const pngToIco = require('png-to-ico');
 const path = './input';
+let array = [];
 
-pngToIco([
-    `${path}/favicon16.png`,
-    `${path}/favicon32.png`,
-    `${path}/favicon48.png`,
-    `${path}/favicon64.png`,
-    `${path}/favicon114.png`,
-    `${path}/favicon128.png`,
-    `${path}/favicon256.png`,
-]).then((buf) => {
-    fs.writeFileSync('./output/favicon.ico', buf);
-})
-.catch(console.error);
+const src = fs
+    .readdirSync(path)
+    .filter((file) => /\.png/.test(file))
+    .map((files) => `${path}/${files}`);
+
+function readFiles() {
+    for (let i = 0; i < src.length; i++) {
+        array.push(src[i]);
+    }
+    return new Promise(function (resolve, reject) {
+        resolve(array);
+    });
+}
+
+// after read files
+readFiles().then(function (resolveData) {
+    pngToIco(resolveData)
+        .then((buf) => {
+            fs.writeFileSync('./output/favicon.ico', buf);
+        })
+        .catch(console.error);
+});
